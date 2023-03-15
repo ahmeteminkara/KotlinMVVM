@@ -43,7 +43,7 @@ dependencies {
     def lifeCycleExtensionVersion = '1.1.1'
     def retrofitVersion = '2.9.0'
     def glideVersion = '4.11.0'
-    def rxJavaVersion = '2.0.0'
+    def rxJavaVersion = '2.1.0'
     def roomVersion = '2.5.0'
     def navVersion = '2.5.3'
     def preferencesVersion = '1.2.0'
@@ -64,6 +64,8 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
+
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
