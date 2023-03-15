@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.aek.kotlinmvvm.view.FeedFragment"
-        android:label="fragment_feed"
+        android:label="Countries"
         tools:layout="@layout/fragment_feed">
         <action
             android:id="@+id/action_feedFragment_to_countryFragment"
@@ -19,7 +19,7 @@
     <fragment
         android:id="@+id/countryFragment"
         android:name="com.aek.kotlinmvvm.view.CountryFragment"
-        android:label="fragment_country"
+        android:label="Detail"
         tools:layout="@layout/fragment_country">
         <argument
             android:name="name"

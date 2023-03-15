@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.aek.kotlinmvvm.databinding.ItemCountryRowBinding
 import com.aek.kotlinmvvm.model.Country
-import com.bumptech.glide.Glide
+import com.aek.kotlinmvvm.util.extentions.loadUrl
 
 class CountryAdapter(
     private val onSelectCountry: (country: Country) -> Unit
 ) : RecyclerView.Adapter<CountryAdapter.ViewHolder>() {
-    private val list = arrayListOf<Country>()
+    private var list = arrayListOf<Country>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -22,7 +22,7 @@ class CountryAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
         with(holder.viewBinding) {
-            Glide.with(root).load(data.flag).into(imageView)
+            imageView.loadUrl(data.flag)
             textViewName.text = data.name
             textViewRegion.text = data.region
 
@@ -34,6 +34,7 @@ class CountryAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<Country>) {
+        list.clear()
         list.addAll(newList)
         notifyDataSetChanged()
     }
