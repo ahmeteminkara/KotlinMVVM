@@ -2,12 +2,17 @@ package com.aek.kotlinmvvm.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.aek.kotlinmvvm.model.Country
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.aek.kotlinmvvm.service.CountryAPI
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 
 class FeedViewModel : ViewModel() {
+
+    private val countryService = CountryAPI()
+    private val disposable = CompositeDisposable()
 
     val countriesLiveData = MutableLiveData<List<Country>>()
     val loadingLiveData = MutableLiveData<Boolean>()
@@ -18,37 +23,26 @@ class FeedViewModel : ViewModel() {
     }
 
     fun refreshData() {
+        getDataFromAPI()
+    }
+
+    private fun getDataFromAPI() {
         loadingLiveData.value = true
-        viewModelScope.launch {
-            delay(3000)
-            loadingLiveData.value = false
-            val dataList = listOf(
-                Country(
-                    "Turkey",
-                    "Ankara",
-                    "Asia",
-                    "TRY",
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Flag_of_Turkey.svg/480px-Flag_of_Turkey.svg.png",
-                    "Turkish"
-                ),
-                Country(
-                    "Italy",
-                    "Roma",
-                    "Europa",
-                    "EUR",
-                    "https://upload.wikimedia.org/wikipedia/en/thumb/0/03/Flag_of_Italy.svg/480px-Flag_of_Italy.svg.png",
-                    "French"
-                ),
-                Country(
-                    "Germany",
-                    "Berlin",
-                    "Europa",
-                    "EUR",
-                    "https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/Flag_of_Germany.svg/480px-Flag_of_Germany.svg.png",
-                    "German"
-                )
-            )
-            countriesLiveData.value = dataList
-        }
+        disposable.add(
+            countryService.getData()
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : DisposableSingleObserver<List<Country>>() {
+                    override fun onSuccess(t: List<Country>) {
+                        countriesLiveData.value = t
+                        loadingLiveData.value = false
+                    }
+
+                    override fun onError(e: Throwable) {
+                        loadingLiveData.value = false
+                        errorLiveData.value = e.localizedMessage
+                    }
+                })
+        )
     }
 }

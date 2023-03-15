@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.aek.kotlinmvvm.databinding.FragmentCountryBinding
-import com.bumptech.glide.Glide
+import com.aek.kotlinmvvm.util.extentions.loadUrl
 
 class CountryFragment : Fragment() {
 
@@ -30,10 +30,7 @@ class CountryFragment : Fragment() {
         }
 
         with(binding) {
-            Glide.with(this@CountryFragment)
-                .load(countryArgs?.flag)
-                .into(imageView)
-
+            imageView.loadUrl(countryArgs?.flag)
             textViewName.text = countryArgs?.name
             textViewCapital.text = countryArgs?.capital
             textViewCurrency.text = countryArgs?.currency
