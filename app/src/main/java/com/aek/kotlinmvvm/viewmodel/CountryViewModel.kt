@@ -1,21 +1,24 @@
 package com.aek.kotlinmvvm.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aek.kotlinmvvm.model.Country
-import com.aek.kotlinmvvm.service.CountryDatabase
+import com.aek.kotlinmvvm.repos.CountryRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CountryViewModel : ViewModel() {
+@HiltViewModel
+class CountryViewModel @Inject constructor(
+    private val repository: CountryRepository
+) : ViewModel() {
 
     val countryLiveData = MutableLiveData<Country>()
 
-    fun getCountryData(context: Context, id: Int) {
+    fun getCountryData(id: Int) {
         viewModelScope.launch {
-            val dao = CountryDatabase(context).countryDao()
-            val country = dao.getWithId(id)
+            val country = repository.getWithId(id)
             countryLiveData.value = country
         }
     }

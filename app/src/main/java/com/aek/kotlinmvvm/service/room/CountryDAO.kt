@@ -1,4 +1,4 @@
-package com.aek.kotlinmvvm.service
+package com.aek.kotlinmvvm.service.room
 
 import androidx.room.Dao
 import androidx.room.Delete
