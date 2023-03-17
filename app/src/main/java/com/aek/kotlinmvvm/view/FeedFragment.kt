@@ -32,14 +32,7 @@ class FeedFragment : Fragment() {
             .create()
 
         adapter = CountryAdapter {
-            val action = FeedFragmentDirections.actionFeedFragmentToCountryFragment(
-                it.name,
-                it.capital,
-                it.region,
-                it.currency,
-                it.flag,
-                it.language
-            )
+            val action = FeedFragmentDirections.actionFeedFragmentToCountryFragment(it.id)
             binding.root.findNavController().navigate(action)
         }
     }
@@ -58,6 +51,8 @@ class FeedFragment : Fragment() {
 
         initView()
         observeViewModel()
+
+        context?.let { viewModel.getData(it) }
     }
 
     private fun initView() {
@@ -65,7 +60,7 @@ class FeedFragment : Fragment() {
             recyclerViewCountry.adapter = adapter
             swipeRefreshLayout.setOnRefreshListener {
                 adapter.clear()
-                viewModel.refreshData()
+                context?.let { viewModel.refreshData(it) }
             }
         }
     }

@@ -22,28 +22,7 @@
         android:label="Detail"
         tools:layout="@layout/fragment_country">
         <argument
-            android:name="name"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="capital"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="region"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="currency"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="flag"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="language"
-            app:argType="string"
-            app:nullable="true" />
+            android:name="countryId"
+            app:argType="integer" />
     </fragment>
 </navigation>
