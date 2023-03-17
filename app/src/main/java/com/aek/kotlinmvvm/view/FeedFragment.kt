@@ -7,12 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.aek.kotlinmvvm.adapter.CountryAdapter
 import com.aek.kotlinmvvm.databinding.FragmentFeedBinding
 import com.aek.kotlinmvvm.viewmodel.FeedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
 
     private lateinit var binding: FragmentFeedBinding
@@ -23,7 +26,7 @@ class FeedFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = ViewModelProviders.of(this)[FeedViewModel::class.java]
+        viewModel = ViewModelProvider(this)[FeedViewModel::class.java]
         alertDialog = AlertDialog.Builder(context)
             .setTitle("Error")
             .setPositiveButton("DISMISS") { dialog, _ ->
@@ -51,8 +54,7 @@ class FeedFragment : Fragment() {
 
         initView()
         observeViewModel()
-
-        context?.let { viewModel.getData(it) }
+        viewModel.getData()
     }
 
     private fun initView() {
@@ -60,7 +62,7 @@ class FeedFragment : Fragment() {
             recyclerViewCountry.adapter = adapter
             swipeRefreshLayout.setOnRefreshListener {
                 adapter.clear()
-                context?.let { viewModel.refreshData(it) }
+                viewModel.refreshData()
             }
         }
     }

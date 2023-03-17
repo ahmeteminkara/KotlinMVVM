@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.aek.kotlinmvvm.databinding.FragmentCountryBinding
 import com.aek.kotlinmvvm.util.extentions.loadUrl
 import com.aek.kotlinmvvm.viewmodel.CountryViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CountryFragment : Fragment() {
 
     private lateinit var binding: FragmentCountryBinding
@@ -22,15 +24,16 @@ class CountryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentCountryBinding.inflate(inflater)
-        viewModel = ViewModelProviders.of(this)[CountryViewModel::class.java]
+        viewModel = ViewModelProvider(this)[CountryViewModel::class.java]
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         arguments?.let { bundle ->
             countryArgs = CountryFragmentArgs.fromBundle(bundle)
-            context?.let { viewModel.getCountryData(it, countryArgs?.countryId ?: 0) }
+            viewModel.getCountryData(countryArgs?.countryId ?: 0)
         }
 
         viewModel.countryLiveData.observe(viewLifecycleOwner) {

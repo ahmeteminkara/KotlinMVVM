@@ -1,55 +1,57 @@
 package com.aek.kotlinmvvm.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aek.kotlinmvvm.model.Country
-import com.aek.kotlinmvvm.service.CountryAPI
-import com.aek.kotlinmvvm.service.CountryDatabase
-import com.aek.kotlinmvvm.util.SingletonSharedPreferences
+import com.aek.kotlinmvvm.repos.CountryRepository
+import com.aek.kotlinmvvm.util.helper.SharedPreferencesHelper
 import com.aek.kotlinmvvm.util.extentions.minuteToMillisecond
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FeedViewModel : ViewModel() {
+@HiltViewModel
+class FeedViewModel @Inject constructor(
+    private val countryRepository: CountryRepository,
+    private val sharedPreferencesHelper: SharedPreferencesHelper
+) :
+    ViewModel() {
 
-    private val countryService = CountryAPI()
     private val disposable = CompositeDisposable()
-    private lateinit var preferences: SingletonSharedPreferences
     private val refreshTime = 10L.minuteToMillisecond()
 
     val countriesLiveData = MutableLiveData<List<Country>>()
     val loadingLiveData = MutableLiveData<Boolean>()
     val errorLiveData = MutableLiveData<String>()
 
-    fun refreshData(context: Context) {
-        preferences.saveTime(0)
-        getData(context)
+    fun refreshData() {
+        sharedPreferencesHelper.saveTime(0)
+        getData()
     }
 
-    fun getData(context: Context) {
-        preferences = SingletonSharedPreferences(context)
-        val updateTime = preferences.getTime()
+    fun getData() {
+        val updateTime = sharedPreferencesHelper.getTime()
         if (updateTime != 0L && (System.nanoTime() - updateTime) < refreshTime) {
-            getDataFromSQLite(context)
+            getDataFromSQLite()
         } else {
-            getDataFromAPI(context)
+            getDataFromAPI()
         }
     }
 
-    private fun getDataFromAPI(context: Context) {
+    private fun getDataFromAPI() {
         loadingLiveData.value = true
         disposable.add(
-            countryService.getData()
+            countryRepository.getCountriesFromApi()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : DisposableSingleObserver<List<Country>>() {
                     override fun onSuccess(t: List<Country>) {
-                        saveCountriesFromRoom(context, t)
+                        saveCountriesFromRoom(t)
                     }
 
                     override fun onError(e: Throwable) {
@@ -60,23 +62,22 @@ class FeedViewModel : ViewModel() {
         )
     }
 
-    private fun getDataFromSQLite(context: Context) {
+    private fun getDataFromSQLite() {
         loadingLiveData.value = true
         viewModelScope.launch {
-            val list = CountryDatabase(context).countryDao().getAll()
+            val list = countryRepository.getAll()
             showCountries(list)
         }
     }
 
-    private fun saveCountriesFromRoom(context: Context, list: List<Country>) {
+    private fun saveCountriesFromRoom(list: List<Country>) {
         viewModelScope.launch {
-            val dao = CountryDatabase(context).countryDao()
-            dao.deleteAll()
-            val addedIds = dao.insertAll(*list.toTypedArray())
+            countryRepository.deleteAll()
+            val addedIds = countryRepository.insertAll(list)
             for (i in addedIds.indices) {
                 list[i].id = addedIds[i].toInt()
             }
-            preferences.saveTime(System.nanoTime())
+            sharedPreferencesHelper.saveTime(System.nanoTime())
             showCountries(list)
         }
     }
