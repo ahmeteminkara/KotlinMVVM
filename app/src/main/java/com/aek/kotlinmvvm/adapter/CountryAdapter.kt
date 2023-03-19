@@ -1,52 +1,32 @@
 package com.aek.kotlinmvvm.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import com.aek.kotlinmvvm.core.base.BaseRecyclerViewAdapter
 import com.aek.kotlinmvvm.databinding.ItemCountryRowBinding
 import com.aek.kotlinmvvm.model.Country
 import com.aek.kotlinmvvm.util.extentions.loadUrl
 
 class CountryAdapter(
     private val onSelectCountry: (country: Country) -> Unit
-) : RecyclerView.Adapter<CountryAdapter.ViewHolder>() {
-    private var list = arrayListOf<Country>()
+) : BaseRecyclerViewAdapter<Country, ItemCountryRowBinding>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = ItemCountryRowBinding.inflate(layoutInflater, parent, false)
-        return ViewHolder(binding)
+    override fun getViewBinding(
+        inflater: LayoutInflater,
+        parent: ViewGroup?
+    ): ItemCountryRowBinding {
+        return ItemCountryRowBinding.inflate(inflater, parent, false)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val data = list[position]
-        with(holder.viewBinding) {
-            imageView.loadUrl(data.flag)
-            textViewName.text = data.name
-            textViewRegion.text = data.region
+    override fun setData(binding: ItemCountryRowBinding, item: Country, position: Int) {
+        with(binding) {
+            imageView.loadUrl(item.flag)
+            textViewName.text = item.name
+            textViewRegion.text = item.region
 
             root.setOnClickListener {
-                onSelectCountry.invoke(data)
+                onSelectCountry.invoke(item)
             }
         }
     }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateList(newList: List<Country>) {
-        list.clear()
-        list.addAll(newList)
-        notifyDataSetChanged()
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun clear() {
-        list.clear()
-        notifyDataSetChanged()
-    }
-
-    override fun getItemCount(): Int = list.size
-
-    class ViewHolder(val viewBinding: ItemCountryRowBinding) :
-        RecyclerView.ViewHolder(viewBinding.root)
 }

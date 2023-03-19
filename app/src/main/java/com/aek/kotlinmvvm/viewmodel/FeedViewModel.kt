@@ -3,6 +3,7 @@ package com.aek.kotlinmvvm.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aek.kotlinmvvm.core.base.BaseViewModel
 import com.aek.kotlinmvvm.model.Country
 import com.aek.kotlinmvvm.repos.CountryRepository
 import com.aek.kotlinmvvm.util.helper.SharedPreferencesHelper
@@ -20,7 +21,7 @@ class FeedViewModel @Inject constructor(
     private val countryRepository: CountryRepository,
     private val sharedPreferencesHelper: SharedPreferencesHelper
 ) :
-    ViewModel() {
+    BaseViewModel() {
 
     private val disposable = CompositeDisposable()
     private val refreshTime = 10L.minuteToMillisecond()
